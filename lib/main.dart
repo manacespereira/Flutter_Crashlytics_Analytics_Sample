@@ -2,6 +2,11 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
+import 'package:firebase_analytics/observer.dart';
+import 'package:flutter_firebase_sample/anlytics/analytics_page.dart';
+import 'package:flutter_firebase_sample/anlytics/tabs_page.dart';
+import 'package:flutter_firebase_sample/crashlytics/crash_page.dart';
 
 void main() {
   // Set `enableInDevMode` to true to see reports while in debug mode
@@ -14,80 +19,64 @@ void main() {
   FlutterError.onError = Crashlytics.instance.recordFlutterError;
 
   runZoned(() {
-    runApp(CrashyApp());
+    runApp(MyApp());
   }, onError: Crashlytics.instance.recordError);
 }
 
-class CrashyApp extends StatefulWidget {
+class MyApp extends StatefulWidget {
+  static FirebaseAnalytics analytics = FirebaseAnalytics();
+  static FirebaseAnalyticsObserver observer =
+      FirebaseAnalyticsObserver(analytics: analytics);
+
   @override
-  _CrashyAppState createState() => _CrashyAppState();
+  _MyAppState createState() => _MyAppState(analytics, observer);
 }
 
-class _CrashyAppState extends State<CrashyApp> {
-  @override
-  void initState() {
-    super.initState();
-  }
+class _MyAppState extends State<MyApp> {
+  final FirebaseAnalytics analytics;
+  final FirebaseAnalyticsObserver observer;
+
+  _MyAppState(this.analytics, this.observer);
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: Scaffold(
-        appBar: AppBar(
-          title: const Text('Crashlytics example app'),
-        ),
-        body: Center(
-          child: Column(
-            children: <Widget>[
-              FlatButton(
-                  child: const Text('Key'),
-                  onPressed: () {
-                    Crashlytics.instance.setString('foo', 'bar');
-                  }),
-              FlatButton(
-                  child: const Text('Log'),
-                  onPressed: () {
-                    Crashlytics.instance.log('baz');
-                  }),
-              FlatButton(
-                  child: const Text('Crash'),
-                  onPressed: () {
-                    // Use Crashlytics to throw an error. Use this for
-                    // confirmation that errors are being correctly reported.
-                    Crashlytics.instance.crash();
-                  }),
-              FlatButton(
-                  child: const Text('Throw Error'),
-                  onPressed: () {
-                    // Example of thrown error, it will be caught and sent to
-                    // Crashlytics.
-                    throw StateError('Uncaught error thrown by app.');
-                  }),
-              FlatButton(
-                  child: const Text('Async out of bounds(FlutterError)'),
-                  onPressed: () {
-                    // Example of an exception that does not get caught
-                    // by `FlutterError.onError` but is caught by the `onError` handler of
-                    // `runZoned`.
-                    Future<void>.delayed(const Duration(seconds: 2), () {
-                      final List<int> list = <int>[];
-                      print(list[100]);
-                    });
-                  }),
-              FlatButton(
-                  child: const Text('Record Error'),
-                  onPressed: () {
-                    try {
-                      throw 'error_example';
-                    } catch (e, s) {
-                      // "context" will append the word "thrown" in the
-                      // Crashlytics console.
-                      Crashlytics.instance
-                          .recordError(e, s, context: 'as an example');
-                    }
-                  }),
-            ],
-          ),
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
+      ),
+      home: Home(),
+      routes: {
+        CrashlyticsPage.ROUTE: (context) => CrashlyticsPage(),
+        AnalyticsPage.ROUTE: (context) => AnalyticsPage(
+              analytics: analytics,
+              observer: observer,
+            ),
+        TabsPage.ROUTE: (context) => TabsPage(observer),
+      },
+      navigatorObservers: <NavigatorObserver>[observer],
+    );
+  }
+}
+
+class Home extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            RaisedButton(
+              child: Text('Firebase Crashlytics Sample'),
+              onPressed: () =>
+                  Navigator.of(context).pushNamed(CrashlyticsPage.ROUTE),
+            ),
+            RaisedButton(
+              child: Text('Firebase Analytics Sample'),
+              onPressed: () =>
+                  Navigator.of(context).pushNamed(AnalyticsPage.ROUTE),
+            )
+          ],
         ),
       ),
     );
