@@ -85,7 +85,7 @@ class _TabsPageState extends State<TabsPage>
 
   void _sendCurrentTabToAnalytics() {
     observer.analytics.setCurrentScreen(
-      screenName: '${TabsPage.ROUTE}/tab$selectedIndex',
+      screenName: '${TabsPage.ROUTE}/select$selectedIndex',
     );
   }
 }
