@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class CrashlyticsPage extends StatefulWidget {
   static const String ROUTE = '/crashlytics';
