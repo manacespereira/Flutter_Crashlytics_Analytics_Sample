@@ -65,10 +65,12 @@ class _MyAppState extends State<MyApp> {
     );
   }
 }
+
 class Home extends StatefulWidget {
   @override
   _HomeState createState() => _HomeState();
 }
+
 class _HomeState extends State<Home> {
   @override
   void initState() {
@@ -82,6 +84,7 @@ class _HomeState extends State<Home> {
     final Uri deepLink = data?.link;
 
     if (deepLink != null) {
+      print('all link $deepLink');
       print('deeplink path ${deepLink.path}');
       Navigator.of(context).pushNamed(deepLink.path);
     }
@@ -91,6 +94,7 @@ class _HomeState extends State<Home> {
       final Uri deepLink = dynamicLink?.link;
 
       if (deepLink != null) {
+        print('all link $deepLink');
         print('deeplink path callback ${deepLink.path}');
         Navigator.of(context).pushNamed(deepLink.path);
       }
@@ -126,7 +130,6 @@ class _HomeState extends State<Home> {
             //   child: Text('Firebase Dynamic link 바로 딥링크 접근'),
             //   onPressed: () =>launch('https://clientflutter.page.link/muUh'),
             // ),
-            
           ],
         ),
       ),
